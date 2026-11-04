@@ -25,6 +25,28 @@ source ingestion
   -> role/location/language/authorization/technical evaluation
   -> evaluated JSON + run metadata
 ```
+```mermaid
+flowchart LR
+    A[Jobicy API] --> D[Source ingestion]
+    B[Arbeitnow API] --> D
+    C[Jobindex search and detail pages] --> D
+
+    S[Airflow schedule] -. triggers .-> D
+
+    D --> E[Raw JSON snapshots]
+    E --> F[Schema normalization]
+    F --> G[Source ID deduplication]
+    G --> H[Requirement extraction]
+    H --> I[Rule-based evaluators]
+
+    I --> J{Decision}
+    J --> K[APPLY]
+    J --> L[REVIEW]
+    J --> M[SKIP]
+
+    I --> N[Evaluated JSON]
+    N --> O[Run metadata]
+```
 
 Outputs are written under `data/` and are intentionally excluded from Git.
 
@@ -75,3 +97,12 @@ metadata disappear when the container is removed.
   model. New ATS heading variants need regression fixtures before parser changes.
 - The pipeline creates full snapshots; it does not yet track new, changed,
   expired, or already-reviewed vacancies across runs.
+
+
+## Example output
+
+A synthetic evaluated-job example is available in
+[`examples/sample_evaluated_jobs.json`](examples/sample_evaluated_jobs.json).
+
+The example contains no real employer, vacancy, applicant, or job-description
+data. Runtime data under `data/` is excluded from Git.

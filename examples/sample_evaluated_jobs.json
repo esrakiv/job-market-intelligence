@@ -1,0 +1,50 @@
+[
+  {
+    "id": "sample:001",
+    "source": "sample",
+    "sourceJobId": "sample-001",
+    "url": "https://example.invalid/jobs/sample-001",
+    "jobTitle": "Analytics Engineer",
+    "companyName": "Example Data Company",
+    "jobGeo": "Copenhagen, Denmark",
+    "jobDescription": "[Synthetic description omitted]",
+    "pubDate": "2026-11-01",
+    "evaluation": {
+      "role": {
+        "role_family": "ANALYTICS_ENGINEERING",
+        "role_fit": "HIGH",
+        "reason": "Matched role family: ANALYTICS_ENGINEERING"
+      },
+      "seniority_fit": "HIGH",
+      "location_fit": "APPLY",
+      "language": {
+        "posting_lang": "ENGLISH",
+        "language_fit": "UNKNOWN",
+        "reason": "No explicit local-language requirement found"
+      },
+      "work_authorization": {
+        "work_authorization_fit": "UNKNOWN",
+        "authorization_signal": "UNKNOWN"
+      },
+      "technical": {
+        "technical_fit": "HIGH",
+        "technical_evidence_status": "PARSED",
+        "required_skills": [
+          "sql",
+          "dbt",
+          "snowflake"
+        ],
+        "matched_required_skills": [
+          "sql",
+          "dbt",
+          "snowflake"
+        ],
+        "missing_required_skills": []
+      }
+    },
+    "decision": "APPLY",
+    "decision_reasons": [
+      "No blocking or unresolved fit signals found"
+    ]
+  }
+]
