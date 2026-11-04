@@ -1,9 +1,12 @@
 # Job Market Intelligence Pipeline
 
-A personal job radar for data engineering and analytics engineering roles. It
-collects postings, normalizes the source schemas, removes source-ID duplicates,
-extracts explicit requirements, and assigns `APPLY`, `REVIEW`, or `SKIP` with
-inspectable reasons.
+[![Tests](https://github.com/esrakiv/job-market-intelligence/actions/workflows/tests.yml/badge.svg)](https://github.com/esrakiv/job-market-intelligence/actions/workflows/tests.yml)
+
+A multi-source data pipeline that collects, normalizes, deduplicates, and
+evaluates data engineering and analytics engineering vacancies.
+
+It was built as a personal decision-support tool, using deterministic and
+inspectable rules to assign `APPLY`, `REVIEW`, or `SKIP` decisions.
 
 ## Sources
 
@@ -17,14 +20,6 @@ silently reporting an incomplete run as successful.
 
 ## Pipeline
 
-```text
-source ingestion
-  -> raw JSON snapshots
-  -> source normalization
-  -> source-ID deduplication
-  -> role/location/language/authorization/technical evaluation
-  -> evaluated JSON + run metadata
-```
 ```mermaid
 flowchart LR
     A[Jobicy API] --> D[Source ingestion]
@@ -47,6 +42,13 @@ flowchart LR
     I --> N[Evaluated JSON]
     N --> O[Run metadata]
 ```
+## Engineering decisions
+
+- Source failures are not treated as successful empty results.
+- Missing evidence is kept separate from explicit incompatibility.
+- Raw and evaluated snapshots are persisted for traceability.
+- Requirement extraction is deterministic and explainable.
+- External API calls are excluded from the regression test suite.
 
 Outputs are written under `data/` and are intentionally excluded from Git.
 
