@@ -11,7 +11,7 @@ COPY pyproject.toml uv.lock README.md ./
 COPY src ./src
 COPY dags ./dags
 
-RUN uv sync --frozen
+RUN uv sync --frozen --no-dev
 
 ENV AIRFLOW__CORE__DAGS_FOLDER=/app/dags
 ENV PYTHONUNBUFFERED=1

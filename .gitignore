@@ -1,0 +1,12 @@
+.DS_Store
+.venv/
+__pycache__/
+*.py[cod]
+
+# Runtime outputs are local pipeline state, not source code.
+data/
+media/
+
+# Unrelated local experiments must not become pipeline dependencies.
+manimations/
+

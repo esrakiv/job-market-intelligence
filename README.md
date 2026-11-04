@@ -1,58 +1,77 @@
 # Job Market Intelligence Pipeline
 
-A data engineering project that collects, processes, and filters job postings to identify relevant Senior Data Engineer and Analytics Engineer roles.
+A personal job radar for data engineering and analytics engineering roles. It
+collects postings, normalizes the source schemas, removes source-ID duplicates,
+extracts explicit requirements, and assigns `APPLY`, `REVIEW`, or `SKIP` with
+inspectable reasons.
 
-## Why I built this
+## Sources
 
-Searching job boards manually is time-consuming and creates a lot of noise.
+- Jobicy remote-job API
+- Arbeitnow job-board API
+- Jobindex search and detail pages
 
-The goal of this project is to automate job collection and progressively build a decision engine that helps identify which roles are worth applying to.
+Jobicy and Arbeitnow are auxiliary sources. Jobindex is the main Denmark source.
+The pipeline deliberately fails when Jobindex search is unavailable instead of
+silently reporting an incomplete run as successful.
 
-## Architecture
-
-Job API
-→ Python ingestion
-→ Raw JSON
-→ Deduplication and transformation
-→ Job classification
-→ Curated jobs
-→ Actionable jobs
-→ Run metadata
-
-Airflow orchestrates the pipeline.
-Docker provides a reproducible runtime environment.
-
-## Current capabilities
-
-- Job ingestion from API
-- Multiple search queries
-- Raw data persistence
-- Deduplication
-- Job classification
-- Curated and actionable job datasets
-- Schema validation
-- Run metadata and traceability
-- Airflow scheduling and retries
-- Dockerized execution
-
-## Tech stack
-
-- Python
-- Airflow
-- Docker
-- Git / GitHub
-- uv
-
-## Project structure
+## Pipeline
 
 ```text
-dags/
-    job_radar_dag.py
+source ingestion
+  -> raw JSON snapshots
+  -> source normalization
+  -> source-ID deduplication
+  -> role/location/language/authorization/technical evaluation
+  -> evaluated JSON + run metadata
+```
 
-src/job_market_intelligence/
-    __main__.py
-    job_api_client.py
+Outputs are written under `data/` and are intentionally excluded from Git.
 
-Dockerfile
-pyproject.toml
-README.md
+## Local setup
+
+Python 3.12 and [uv](https://docs.astral.sh/uv/) are required.
+
+```bash
+uv sync --frozen
+uv run python -m job_market_intelligence
+```
+
+The installed command is equivalent:
+
+```bash
+uv run job-market-intelligence
+```
+
+Run the regression suite without external API calls:
+
+```bash
+uv run python -m unittest discover -s tests -v
+```
+
+## Airflow and Docker
+
+The DAG runs at 09:00 Europe/Copenhagen time on weekdays. Build and start the
+standalone Airflow image with:
+
+```bash
+docker build -t job-radar .
+docker run --rm -p 8080:8080 \
+  -v "$PWD/data:/app/data" \
+  job-radar
+```
+
+The data volume is required. Without it, raw files, evaluated results, and run
+metadata disappear when the container is removed.
+
+## Known limitations
+
+- Candidate skills and target geography are still hard-coded.
+- Deduplication is exact by source ID; the same vacancy syndicated by two
+  providers can remain twice.
+- External Jobindex application pages can block scraping, leaving a short or
+  empty description that must remain `REVIEW`.
+- Requirement extraction is deterministic and conservative, not a general NLP
+  model. New ATS heading variants need regression fixtures before parser changes.
+- The pipeline creates full snapshots; it does not yet track new, changed,
+  expired, or already-reviewed vacancies across runs.
